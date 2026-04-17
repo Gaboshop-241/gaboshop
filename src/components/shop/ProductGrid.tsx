@@ -2,21 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Star, Search, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 import { toast } from 'sonner'
+
+const ITEMS_PER_PAGE = 8
 
 interface Product {
   id: string
@@ -28,7 +17,6 @@ interface Product {
   space: 'official' | 'marketplace'
   vendor_id: string | null
   categories: { id: string; name_fr: string; name_en: string; slug: string } | null
-  vendors?: { business_name: string; is_verified: boolean } | null
 }
 
 interface Category {
@@ -46,13 +34,12 @@ interface Props {
 }
 
 export default function ProductGrid({ products, categories, locale, space }: Props) {
-  const t = useTranslations('shop')
-  const tCommon = useTranslations('common')
   const addItem = useCartStore((s) => s.addItem)
 
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sort, setSort] = useState('newest')
+  const [page, setPage] = useState(1)
 
   const filtered = products
     .filter((p) => {
@@ -66,6 +53,10 @@ export default function ProductGrid({ products, categories, locale, space }: Pro
       if (sort === 'price_desc') return b.price - a.price
       return 0
     })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE))
+  const currentPage = Math.min(page, totalPages)
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
   function handleAddToCart(product: Product) {
     const title = locale === 'fr' ? product.title_fr : product.title_en
@@ -82,103 +73,187 @@ export default function ProductGrid({ products, categories, locale, space }: Pro
     toast.success(`${title} ajouté au panier`)
   }
 
+  function handleSearch(val: string) { setSearch(val); setPage(1) }
+  function handleCategory(val: string) { setSelectedCategory(val); setPage(1) }
+  function handleSort(val: string) { setSort(val); setPage(1) }
+
+  function getPageNumbers(): (number | '...')[] {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1)
+    if (currentPage <= 3) return [1, 2, 3, '...', totalPages]
+    if (currentPage >= totalPages - 2) return [1, '...', totalPages - 2, totalPages - 1, totalPages]
+    return [1, '...', currentPage, '...', totalPages]
+  }
+
   return (
     <div>
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={tCommon('search')}
+      {/* Filters bar */}
+      <section className="mb-10 p-4 bg-white rounded-2xl flex flex-wrap items-center gap-4 shadow-sm border border-[#bdcaba]/10">
+        <div className="relative flex-1 min-w-[240px]">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#3e4a3d]" style={{ fontSize: '18px' }}>
+            search
+          </span>
+          <input
+            type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Rechercher un produit..."
+            className="w-full bg-[#f2f3ff] border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#006b2c] focus:outline-none"
           />
         </div>
-        <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v ?? 'all')}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder={t('all_categories')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('all_categories')}</SelectItem>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={selectedCategory}
+            onChange={(e) => handleCategory(e.target.value)}
+            className="bg-[#f2f3ff] border-none rounded-xl py-2.5 px-4 text-sm font-medium text-[#3e4a3d] focus:ring-1 focus:ring-[#006b2c] focus:outline-none min-w-[180px] appearance-none cursor-pointer"
+          >
+            <option value="all">Toutes les catégories</option>
             {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
+              <option key={cat.id} value={cat.id}>
                 {locale === 'fr' ? cat.name_fr : cat.name_en}
-              </SelectItem>
+              </option>
             ))}
-          </SelectContent>
-        </Select>
-        <Select value={sort} onValueChange={(v) => setSort(v ?? 'newest')}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">{t('sort_newest')}</SelectItem>
-            <SelectItem value="price_asc">{t('sort_price_asc')}</SelectItem>
-            <SelectItem value="price_desc">{t('sort_price_desc')}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          </select>
+          <select
+            value={sort}
+            onChange={(e) => handleSort(e.target.value)}
+            className="bg-[#f2f3ff] border-none rounded-xl py-2.5 px-4 text-sm font-medium text-[#3e4a3d] focus:ring-1 focus:ring-[#006b2c] focus:outline-none min-w-[160px] appearance-none cursor-pointer"
+          >
+            <option value="newest">Plus récents</option>
+            <option value="price_asc">Prix croissant</option>
+            <option value="price_desc">Prix décroissant</option>
+          </select>
+        </div>
+      </section>
 
-      {/* Grid */}
-      {filtered.length === 0 ? (
-        <div className="text-center py-20 text-muted-foreground">{t('no_products')}</div>
+      {/* Empty state */}
+      {paginated.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="w-20 h-20 rounded-2xl bg-[#f2f3ff] flex items-center justify-center">
+            <span className="material-symbols-outlined text-[#006b2c] text-4xl">inventory_2</span>
+          </div>
+          <p className="text-[#131b2e] font-bold text-lg">Aucun produit trouvé</p>
+          <p className="text-[#3e4a3d] text-sm">Aucun produit ne correspond à vos critères.</p>
+          <button
+            onClick={() => { setSearch(''); setSelectedCategory('all'); setSort('newest'); setPage(1) }}
+            className="mt-2 inline-flex items-center justify-center px-5 py-2.5 rounded-xl border-2 border-[#006b2c] text-[#006b2c] text-sm font-semibold hover:bg-[#006b2c] hover:text-white transition-colors"
+          >
+            Réinitialiser les filtres
+          </button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((product) => {
-            const title = locale === 'fr' ? product.title_fr : product.title_en
-            const href = `/${locale}/${space}/${product.id}`
-            return (
-              <Card key={product.id} className="group overflow-hidden hover:shadow-md transition-shadow">
-                <Link href={href}>
-                  <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
-                    {product.images[0] ? (
-                      <img
-                        src={product.images[0]}
-                        alt={title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                    ) : (
-                      <span className="text-5xl">📦</span>
-                    )}
-                  </div>
-                </Link>
-                <CardContent className="p-4">
-                  {product.vendors && (
-                    <div className="flex items-center gap-1 mb-1">
-                      <span className="text-xs text-muted-foreground">{product.vendors.business_name}</span>
-                      {product.vendors.is_verified && (
-                        <Badge variant="secondary" className="text-[10px] px-1 py-0">✓</Badge>
+        <>
+          {/* Product grid */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {paginated.map((product) => {
+              const title = locale === 'fr' ? product.title_fr : product.title_en
+              const href = `/${locale}/${space === 'official' ? 'shop' : 'marketplace'}/${product.id}`
+              const categoryName =
+                (locale === 'fr' ? product.categories?.name_fr : product.categories?.name_en) ?? null
+
+              return (
+                <div
+                  key={product.id}
+                  className="group bg-white rounded-xl p-3 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#006b2c]/5 border border-transparent hover:border-[#006b2c]/10"
+                >
+                  <Link href={href}>
+                    <div className="aspect-video rounded-lg overflow-hidden mb-4 relative">
+                      {product.images[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-[#eaedff] flex items-center justify-center">
+                          <span className="material-symbols-outlined text-[#006b2c] text-5xl">inventory_2</span>
+                        </div>
+                      )}
+                      {categoryName && (
+                        <span className="absolute top-2 left-2 px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/90 text-[#006b2c] border border-[#006b2c]/20 rounded-full">
+                          {categoryName}
+                        </span>
                       )}
                     </div>
-                  )}
-                  <Link href={href}>
-                    <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">
-                      {title}
-                    </h3>
                   </Link>
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="font-bold text-primary text-lg">
-                      {product.price.toLocaleString()} FCFA
-                    </span>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      <span>4.8</span>
+
+                  <div className="px-1">
+                    <Link href={href}>
+                      <h3 className="font-bold text-[#131b2e] text-lg mb-1 leading-tight group-hover:text-[#006b2c] transition-colors line-clamp-2">
+                        {title}
+                      </h3>
+                    </Link>
+
+                    <div className="flex items-center gap-1 mb-3">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <span
+                          key={i}
+                          className="material-symbols-outlined text-amber-400 text-sm"
+                          style={{ fontVariationSettings: "'FILL' 1" }}
+                        >
+                          star
+                        </span>
+                      ))}
+                      <span className="text-[10px] text-[#3e4a3d] font-medium ml-1">(--)</span>
                     </div>
+
+                    <div className="flex items-baseline gap-2 mb-4">
+                      <span className="text-xl font-extrabold text-[#006b2c]">
+                        {product.price.toLocaleString()} FCFA
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="w-full py-3 bg-[#006b2c] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#00873a]"
+                    >
+                      <span className="material-symbols-outlined text-lg">shopping_cart</span>
+                      Ajouter au panier
+                    </button>
                   </div>
-                  <Button
-                    className="w-full mt-3"
-                    size="sm"
-                    onClick={() => handleAddToCart(product)}
+                </div>
+              )
+            })}
+          </section>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <section className="mt-16 flex justify-center items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#bdcaba]/30 text-[#3e4a3d] hover:border-[#006b2c] hover:text-[#006b2c] transition-all disabled:opacity-40"
+              >
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+
+              {getPageNumbers().map((p, i) =>
+                p === '...' ? (
+                  <span key={`dots-${i}`} className="px-2 text-[#3e4a3d]">...</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p as number)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all ${
+                      currentPage === p
+                        ? 'bg-[#006b2c] text-white'
+                        : 'border border-[#bdcaba]/30 text-[#3e4a3d] hover:border-[#006b2c] hover:text-[#006b2c]'
+                    }`}
                   >
-                    <ShoppingCart className="mr-2 h-3 w-3" />
-                    {t('add_to_cart')}
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#bdcaba]/30 text-[#3e4a3d] hover:border-[#006b2c] hover:text-[#006b2c] transition-all disabled:opacity-40"
+              >
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
+            </section>
+          )}
+        </>
       )}
     </div>
   )

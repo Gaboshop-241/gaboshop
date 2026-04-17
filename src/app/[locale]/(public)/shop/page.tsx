@@ -1,5 +1,5 @@
-import { useTranslations } from 'next-intl'
 import { getLocale } from 'next-intl/server'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import ProductGrid from '@/components/shop/ProductGrid'
 
@@ -30,18 +30,30 @@ export default async function ShopPage() {
     getLocale(),
   ])
 
-  return <ShopPageContent products={products} categories={categories} locale={locale} />
-}
-
-function ShopPageContent({ products, categories, locale }: { products: any[]; categories: any[]; locale: string }) {
-  const t = useTranslations('shop')
-
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
-      </div>
+    <div className="pb-28 md:pb-10 max-w-7xl mx-auto px-6 pt-8">
+
+      {/* Breadcrumb & Title */}
+      <section className="mb-8">
+        <nav className="flex items-center gap-2 text-sm text-[#3e4a3d] mb-4">
+          <Link href={`/${locale}`} className="hover:text-[#006b2c] transition-colors">
+            Accueil
+          </Link>
+          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chevron_right</span>
+          <span className="text-[#006b2c] font-medium">Boutique</span>
+        </nav>
+        <div className="flex items-center gap-3">
+          <h1 className="font-bold text-3xl text-[#131b2e]">Boutique Officielle</h1>
+          <span
+            className="material-symbols-outlined text-[#006b2c]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            verified
+          </span>
+        </div>
+        <p className="text-[#3e4a3d] mt-1">Abonnements, comptes partagés et services digitaux</p>
+      </section>
+
       <ProductGrid products={products} categories={categories} locale={locale} space="official" />
     </div>
   )
