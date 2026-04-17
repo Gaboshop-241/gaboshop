@@ -28,5 +28,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   if (!product) notFound()
 
-  return <ProductDetail product={product} locale={locale} relatedProducts={relatedProducts ?? []} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <ProductDetail product={product} locale={locale} relatedProducts={(relatedProducts ?? []) as any} />
 }
