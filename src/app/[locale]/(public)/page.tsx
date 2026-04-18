@@ -2,233 +2,438 @@ import { getLocale } from 'next-intl/server'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
+// ── Static content (production: move to i18n messages) ───────────────────────
+
+const PLATFORMS = [
+  { name: 'Netflix',        color: '#E50914', initial: 'N'  },
+  { name: 'Spotify',        color: '#1DB954', initial: 'S'  },
+  { name: 'Disney+',        color: '#0063E5', initial: 'D+' },
+  { name: 'YouTube Premium', color: '#FF0033', initial: 'YT' },
+  { name: 'Prime Video',    color: '#00A8E1', initial: 'P'  },
+  { name: 'Crunchyroll',    color: '#F47521', initial: 'CR' },
+  { name: 'Apple TV+',      color: '#000000', initial: 'TV' },
+  { name: 'Canal+',         color: '#ED1B2F', initial: 'C+' },
+]
+
+const FEATURES = [
+  { icon: 'sell',           title: 'Prix avantageux',        desc: "Jusqu'à -70% sur vos abonnements digitaux préférés — sans compromis sur la qualité.", tint: '#006b2c' },
+  { icon: 'bolt',           title: 'Livraison instantanée',  desc: 'Recevez vos accès par email en moins de 5 minutes après paiement — 24/7.',           tint: '#eab308' },
+  { icon: 'verified_user',  title: 'Sécurité garantie',      desc: 'Paiements cryptés via Airtel Money, Moov Money et cartes bancaires. Aucun partage.', tint: '#2563eb' },
+  { icon: 'support_agent',  title: 'Support local 7j/7',     desc: "Une équipe gabonaise basée à Libreville, disponible par chat, téléphone et email.",  tint: '#9333ea' },
+]
+
+const STATS = [
+  { value: '10 000+', label: 'Clients satisfaits' },
+  { value: '50+',     label: 'Abonnements disponibles' },
+  { value: '4.9/5',   label: 'Note moyenne' },
+  { value: '< 5 min', label: 'Délai de livraison' },
+]
+
+const TESTIMONIALS = [
+  { name: 'Marie Obame',       role: 'Cliente à Libreville', initial: 'M', text: 'Mon Netflix reçu en 2 minutes, aucun souci. Je recommande GaboShop à toute ma famille.' },
+  { name: 'Jean-Paul Nze',     role: 'Abonné Premium',       initial: 'J', text: 'Des prix imbattables et un support réactif. J’ai fait des économies énormes cette année.' },
+  { name: 'Sandrine Boussougou', role: 'Étudiante',          initial: 'S', text: 'Parfait pour mon Spotify étudiant. Le paiement Airtel Money est super pratique !' },
+]
+
+// ── Data ─────────────────────────────────────────────────────────────────────
+
 async function getFeaturedProducts() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('id, title_fr, title_en, price, currency, images, space, vendor_id, categories(id, name_fr, name_en, slug)')
     .eq('is_active', true)
-    .limit(3)
+    .limit(6)
     .order('created_at', { ascending: false })
   return data ?? []
 }
 
+// ── Page ─────────────────────────────────────────────────────────────────────
+
 export default async function HomePage() {
-  const [locale, products] = await Promise.all([
-    getLocale(),
-    getFeaturedProducts(),
-  ])
+  const [locale, products] = await Promise.all([getLocale(), getFeaturedProducts()])
 
   return (
     <div className="bg-[#faf8ff] text-[#131b2e] selection:bg-[#7ffc97] selection:text-[#002109]">
 
-      {/* HERO */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-br from-[#16a34a] to-[#00873a] text-white py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-8 relative z-10 flex flex-col lg:flex-row items-center">
-          {/* Left */}
-          <div className="w-full lg:w-3/5">
-            <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
-              La marketplace <br />du Gabon
+      {/* ══════════════ HERO ══════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#003d19] via-[#006b2c] to-[#00873a] text-white">
+        {/* Decorative radial glow */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full bg-[#7ffc97]/20 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-[32rem] h-[32rem] rounded-full bg-[#00873a]/40 blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left: Copy */}
+          <div className="text-center lg:text-left">
+            {/* Trust badge */}
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
+              <span className="flex -space-x-2">
+                {[1,2,3].map((i) => (
+                  <span key={i} className="w-5 h-5 rounded-full bg-[#7ffc97] border-2 border-[#006b2c] text-[#006b2c] text-[9px] font-bold flex items-center justify-center">
+                    {['A','B','C'][i-1]}
+                  </span>
+                ))}
+              </span>
+              <span className="text-xs font-medium text-white/90">
+                <span className="font-bold text-[#7ffc97]">+10 000</span> clients nous font confiance
+              </span>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6">
+              Tous vos abonnements<br />
+              <span className="bg-gradient-to-r from-[#7ffc97] to-white bg-clip-text text-transparent">digitaux, au Gabon.</span>
             </h1>
-            <p className="text-xl lg:text-2xl text-[#62df7d] mb-10 max-w-xl font-medium">
-              Abonnements, services digitaux et revendeurs locaux réunis sur une seule plateforme sécurisée.
+
+            <p className="text-lg sm:text-xl text-[#d7fde1] mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Netflix, Spotify, Disney+, YouTube Premium… Achetez vos abonnements favoris en FCFA, livraison instantanée par email, paiement sécurisé Airtel Money & Moov Money.
             </p>
-            <div className="flex flex-wrap gap-4">
+
+            {/* CTAs */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
               <Link
                 href={`/${locale}/shop`}
-                className="bg-white text-[#006b2c] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#f2f3ff] transition-all duration-300 shadow-xl shadow-[#00873a]/20"
+                className="group inline-flex items-center gap-2 bg-white text-[#006b2c] px-7 py-4 rounded-xl font-bold text-base shadow-xl shadow-[#003d19]/40 hover:shadow-2xl hover:scale-[1.03] transition-all"
               >
-                Découvrir la boutique
+                Voir les abonnements
+                <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </Link>
               <Link
                 href={`/${locale}/marketplace`}
-                className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all duration-300"
+                className="inline-flex items-center gap-2 border-2 border-white/50 text-white px-7 py-4 rounded-xl font-bold text-base hover:bg-white/10 hover:border-white transition-all"
               >
-                Accéder au marketplace
+                Marketplace local
               </Link>
             </div>
-          </div>
 
-          {/* Decorative blob */}
-          <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full pointer-events-none opacity-20">
-            <svg className="w-full h-full scale-125" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-              <path d="M42.1,-71.4C55.4,-64.1,67.6,-53.4,76.5,-40.3C85.5,-27.2,91.3,-11.6,89.5,3.1C87.6,17.7,78.2,31.4,67.4,43.2C56.6,55.1,44.4,65,30.7,71.4C16.9,77.7,1.5,80.5,-14.8,79C-31,77.5,-48,71.8,-61.1,61.1C-74.2,50.3,-83.4,34.5,-87,17.7C-90.7,0.9,-88.9,-17,-81.1,-32.5C-73.4,-47.9,-59.8,-61,-44.6,-67.5C-29.3,-74.1,-14.7,-74.2,0.4,-74.8C15.4,-75.4,30.8,-76.5,42.1,-71.4Z" fill="currentColor" transform="translate(250 250)" />
-            </svg>
-          </div>
-
-          {/* Right images */}
-          <div className="hidden lg:block w-2/5 relative">
-            <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl rotate-3 bg-white p-2">
-              <img
-                alt="GaboShop Lifestyle"
-                className="w-full h-full object-cover rounded-2xl"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFEpEg13C6v8T79GywuDFy4Bj_Q8E4zKIqSR_LW6nstP5gNDOMVnzImqsgQPJvlrfOOFw3UuSXWN8SAAqRUc2AzlD0iIy5qa8HOJB1ZB9M595hWzkUbdrkqfSvmLRryjBk_1bC039pUZ8uaiSdTDZXUXGbKrvEi3wvbh0oYLBGm0kuhrt3EAimYyQkXRyiVEfnkVyLx_FW8hfccS19ci5hOrb7L5powj-NHzJYAv7-ENfWulWSiQZRfeu4gCdJIKN9PVMXnAIbFd0h"
-              />
+            {/* Social proof rating */}
+            <div className="flex items-center justify-center lg:justify-start gap-4 text-sm">
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map((i) => (
+                  <span key={i} className="material-symbols-outlined text-[#ffc93c]" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>star</span>
+                ))}
+              </div>
+              <span className="text-white/90">
+                <span className="font-bold">4.9/5</span> · <span className="text-white/70">basé sur 1 248 avis</span>
+              </span>
             </div>
-            <div className="absolute -bottom-8 -left-8 aspect-square w-48 rounded-3xl overflow-hidden shadow-2xl -rotate-6 border-4 border-white bg-[#e2e7ff]">
-              <img
-                alt="Shopping local"
-                className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcOEwKjThkSMFgcCj-zn7Kxp5MvixKnZ7lA66ChMr7V1bo0fWQ1G7iz14GgFjrAf27XSKSYsMqDrfmvK9wOwWWGeEi76CLEEINmfdihWV2iy_uHg0p2sjAsbHH7kBoq9QfiXyALdzH7yh6jOFImUzT-X883wo9M8U96WRDZC6i5ME92ozOLFrI7MvNB7RddyBGA_vc9-iV51NAIpUu6hgfRLUgHI3mMisNamoYZwv5w1KI1Be-1nM7umgBmIlegzgdDelxSYN62PXn"
-              />
+          </div>
+
+          {/* Right: Platform cards collage */}
+          <div className="hidden lg:block relative h-[32rem]">
+            {/* Glass card: transaction success */}
+            <div className="absolute top-0 right-0 w-80 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#E50914] flex items-center justify-center text-white font-black text-xl">N</div>
+                  <div>
+                    <div className="font-bold text-white">Netflix Premium</div>
+                    <div className="text-xs text-white/60">1 mois · 4K UHD</div>
+                  </div>
+                </div>
+                <span className="bg-[#7ffc97] text-[#003d19] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Actif</span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-white/70">
+                  <span>Prix</span>
+                  <span className="font-bold text-white">4 500 FCFA</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Économie</span>
+                  <span className="font-bold text-[#7ffc97]">-65%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Spotify */}
+            <div className="absolute top-44 left-0 w-72 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl rotate-[-3deg]">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-[#1DB954] flex items-center justify-center text-white font-black text-xl">S</div>
+                <div>
+                  <div className="font-bold text-white">Spotify Premium</div>
+                  <div className="text-xs text-white/60">Famille · 6 comptes</div>
+                </div>
+              </div>
+              <div className="flex justify-between items-end">
+                <span className="text-2xl font-extrabold text-white">3 000<span className="text-sm text-white/60 font-normal ml-1">FCFA/mois</span></span>
+                <span className="material-symbols-outlined text-[#7ffc97]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+              </div>
+            </div>
+
+            {/* Disney+ */}
+            <div className="absolute bottom-8 right-8 w-64 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-5 shadow-2xl rotate-[4deg]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0063E5] flex items-center justify-center text-white font-black text-sm">D+</div>
+                <div className="flex-1">
+                  <div className="font-bold text-white text-sm">Disney+</div>
+                  <div className="text-xs text-[#7ffc97] font-semibold">Livraison instantanée</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Airtel Money confirmation */}
+            <div className="absolute bottom-40 left-8 bg-white rounded-2xl p-4 shadow-2xl flex items-center gap-3 w-60">
+              <div className="w-10 h-10 rounded-xl bg-[#7ffc97] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#006b2c]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              </div>
+              <div className="flex-1">
+                <div className="text-[#131b2e] font-bold text-sm">Paiement reçu</div>
+                <div className="text-[#3e4a3d] text-[10px]">Airtel Money · 2 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Platform strip */}
+        <div className="relative border-t border-white/10 bg-black/20 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+            <p className="text-center text-xs font-semibold uppercase tracking-widest text-white/50 mb-4">
+              Plateformes disponibles
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
+              {PLATFORMS.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">
+                  <span
+                    className="w-6 h-6 rounded-md flex items-center justify-center text-white font-black text-[10px]"
+                    style={{ backgroundColor: p.color }}
+                  >
+                    {p.initial}
+                  </span>
+                  <span className="text-sm font-medium text-white/90">{p.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* TWO SPACES */}
-      <section className="py-20 px-8 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Boutique Officielle */}
-          <div className="group relative overflow-hidden rounded-[2rem] bg-[#006b2c] p-10 flex flex-col justify-between min-h-[400px] transition-all hover:scale-[1.02] duration-300">
-            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 bg-[#00873a] rounded-full opacity-30 group-hover:scale-110 transition-transform" />
-            <div className="relative">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-8">
-                <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>shield_with_heart</span>
+      {/* ══════════════ FEATURES ══════════════ */}
+      <section className="py-20 px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="text-[#006b2c] font-bold tracking-widest text-xs uppercase mb-2 block">Pourquoi GaboShop</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#131b2e] leading-tight max-w-2xl mx-auto">
+              La manière la plus simple de s'abonner, au Gabon
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {FEATURES.map((f) => (
+              <div
+                key={f.icon}
+                className="group relative bg-white border border-[#e2e7ff] rounded-2xl p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${f.tint}15` }}
+                >
+                  <span
+                    className="material-symbols-outlined text-3xl"
+                    style={{ color: f.tint, fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {f.icon}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-[#131b2e] mb-2">{f.title}</h3>
+                <p className="text-sm text-[#3e4a3d] leading-relaxed">{f.desc}</p>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">Boutique Officielle</h2>
-              <p className="text-[#7ffc97] max-w-xs font-medium opacity-90">
-                Produits certifiés, abonnements IPTV, licences logicielles et garanties exclusives GaboShop.
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════ TWO SPACES ══════════════ */}
+      <section className="py-16 px-6 lg:px-8 bg-[#f2f3ff]">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-6">
+          {/* Boutique officielle */}
+          <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#006b2c] to-[#00873a] p-8 md:p-10 min-h-[340px] flex flex-col justify-between hover:shadow-2xl hover:shadow-[#006b2c]/30 transition-all">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-[#7ffc97]/20 rounded-full group-hover:scale-110 transition-transform" />
+            <div className="relative">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-white text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>shield_with_heart</span>
+              </div>
+              <h2 className="text-3xl font-extrabold text-white mb-3">Boutique Officielle</h2>
+              <p className="text-[#d7fde1] max-w-sm leading-relaxed">
+                Abonnements certifiés Netflix, Spotify, Disney+ et plus. Garantie 100% GaboShop, livraison en 5 min.
               </p>
             </div>
             <Link
               href={`/${locale}/shop`}
-              className="relative mt-8 w-fit bg-white text-[#006b2c] px-8 py-3 rounded-full font-bold hover:shadow-lg transition-all"
+              className="relative mt-6 inline-flex items-center gap-2 bg-white text-[#006b2c] px-6 py-3 rounded-full font-bold text-sm w-fit hover:shadow-lg hover:scale-105 transition-all"
             >
-              Voir les exclusivités
+              Voir les abonnements
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
             </Link>
           </div>
 
-          {/* Marketplace Local */}
-          <div className="group relative overflow-hidden rounded-[2rem] bg-[#283044] p-10 flex flex-col justify-between min-h-[400px] transition-all hover:scale-[1.02] duration-300">
-            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 bg-slate-700 rounded-full opacity-30 group-hover:scale-110 transition-transform" />
+          {/* Marketplace */}
+          <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#283044] to-[#131b2e] p-8 md:p-10 min-h-[340px] flex flex-col justify-between hover:shadow-2xl transition-all">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-slate-600/30 rounded-full group-hover:scale-110 transition-transform" />
             <div className="relative">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-8">
-                <span className="material-symbols-outlined text-[#82f5c1] text-4xl">groups</span>
+              <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-[#82f5c1] text-3xl">groups</span>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">Marketplace Local</h2>
-              <p className="text-slate-400 max-w-xs font-medium">
-                Achetez et vendez en toute sécurité avec nos partenaires locaux à travers tout le Gabon.
+              <h2 className="text-3xl font-extrabold text-white mb-3">Marketplace Local</h2>
+              <p className="text-slate-400 max-w-sm leading-relaxed">
+                Achetez et vendez en toute sécurité avec nos vendeurs partenaires à travers tout le Gabon.
               </p>
             </div>
             <Link
               href={`/${locale}/marketplace`}
-              className="relative mt-8 w-fit border-2 border-slate-600 text-white px-8 py-3 rounded-full font-bold hover:bg-white/5 transition-all"
+              className="relative mt-6 inline-flex items-center gap-2 border-2 border-white/30 text-white px-6 py-3 rounded-full font-bold text-sm w-fit hover:bg-white/10 hover:border-white transition-all"
             >
               Explorer le marché
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
-      <section className="py-20 bg-[#f2f3ff]">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="flex justify-between items-end mb-12">
+      {/* ══════════════ TRENDING PRODUCTS ══════════════ */}
+      <section className="py-20 px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-12">
             <div>
               <span className="text-[#006b2c] font-bold tracking-widest text-xs uppercase mb-2 block">Tendances actuelles</span>
-              <h2 className="text-4xl font-extrabold text-[#131b2e]">Produits populaires</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#131b2e]">Les plus populaires</h2>
             </div>
-            <Link href={`/${locale}/shop`} className="text-[#006b2c] font-semibold flex items-center gap-2 group">
-              Voir tout{' '}
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-[20px]">arrow_forward</span>
-            </Link>
+            {products.length > 0 && (
+              <Link href={`/${locale}/shop`} className="inline-flex items-center gap-2 text-[#006b2c] font-semibold group w-fit">
+                Voir tout
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-[20px]">arrow_forward</span>
+              </Link>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.length > 0 ? (
-              products.map((p) => (
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.slice(0, 6).map((p) => (
                 <ProductCard key={p.id} product={p as any} locale={locale} />
-              ))
-            ) : (
-              <>
-                <StaticProductCard
-                  img="https://lh3.googleusercontent.com/aida-public/AB6AXuBMZNelW-r-as5bzeSnefM7SMdc9BksfhaOBKXP2tmbZjxZJgxYomzcWE21QAWwGOiiGuCarlSmqeudxkg-kT4f7lVocNY33LVjmviJZ9p3O12e3leMRBnZW-2d0cO_ddScPvGdY3IiVt6mUct3VIYs3ArWT2WZs_VZSscsYdNMD-RhL0C-r5AL5mzN-gr8OaR6vsYLTKSdDp818TSn2ORp3ktgJhDFXUEBDEGy2AJrFuC781X2J7nDVKBVnKFnDwNJPrWnz4k5NoBi"
-                  badge="Officiel"
-                  seller="GaboShop Digital"
-                  title="Pack Divertissement Plus (12 mois)"
-                  stars={5}
-                  reviews={48}
-                  price="45,000 FCFA"
-                  href={`/${locale}/shop`}
-                />
-                <StaticProductCard
-                  img="https://lh3.googleusercontent.com/aida-public/AB6AXuCsawceMlU__3CcNeObzdd-UyuXXiZzVZDmFXJIvbgtv_9R2Isn9uqDjlTNwUtbnhg1_0d5ZV_PKNExDotwXZRblKmwlCQTwBJp0iyX8YGz2_dk9tW4n7so07-8XEUtm8e29gycOnYLNjdyteB2wuEn0A7NCDjweRNai7BOMrMH9MWkh1E7whafdiKANIxScpCB5hRSbJOumIdCfJ445-LfTMDx5KERyykbu3h8Zhd1yG5RS6TMG2Xjfi7yfj8fgdAxTvpcOm9F15I4"
-                  seller="Boutique Libreville"
-                  title='Laptop Air 13" - 8GB RAM 256GB'
-                  stars={4}
-                  reviews={12}
-                  price="320,000 FCFA"
-                  href={`/${locale}/shop`}
-                />
-                <StaticProductCard
-                  img="https://lh3.googleusercontent.com/aida-public/AB6AXuAWpcLSoSa-VqqKaKfajZEavgsEunrsAGrseCBdGW46P3vlLpmS8FU8UaMiO3hcoNwlxNziyZ5ENq0n5SYGE9GlnlilFGQnObBOCXFsqCYM7mh-HfdwqE8dpc1bCNBIrRqhJA_2YczijbJ1MH6LRyj14S3AUJ1Y6hm7IvxWRDWNoUZbpKsCOunpYQ1UiJJllFmz33i5z6dn4rB42dgpSETw1oBfcl6-XntFRmf-rFhrPnjs1_Mcl8r0mDbxB0QET9v3x-euezlW4_dL"
-                  badge="Digital"
-                  seller="GaboShop Software"
-                  title="Antivirus Total Protection (2 Postes)"
-                  stars={5}
-                  reviews={124}
-                  price="15,500 FCFA"
-                  href={`/${locale}/shop`}
-                />
-              </>
-            )}
+              ))}
+            </div>
+          ) : (
+            <EmptyState locale={locale} />
+          )}
+        </div>
+      </section>
+
+      {/* ══════════════ TRUST / STATS / TESTIMONIALS ══════════════ */}
+      <section className="py-20 px-6 lg:px-8 bg-gradient-to-b from-[#faf8ff] to-[#f2f3ff]">
+        <div className="max-w-7xl mx-auto">
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+            {STATS.map((s) => (
+              <div key={s.label} className="bg-white border border-[#e2e7ff] rounded-2xl p-6 text-center hover:border-[#006b2c] transition-colors">
+                <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-[#006b2c] to-[#00873a] bg-clip-text text-transparent mb-1">
+                  {s.value}
+                </div>
+                <div className="text-xs sm:text-sm text-[#3e4a3d] font-medium uppercase tracking-wider">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Testimonials */}
+          <div className="text-center mb-12">
+            <span className="text-[#006b2c] font-bold tracking-widest text-xs uppercase mb-2 block">Avis clients</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#131b2e]">Ils nous font confiance</h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="bg-white border border-[#e2e7ff] rounded-2xl p-7 hover:shadow-lg transition-shadow">
+                <div className="flex gap-0.5 mb-4">
+                  {[1,2,3,4,5].map((i) => (
+                    <span key={i} className="material-symbols-outlined text-[#ffc93c]" style={{ fontSize: '18px', fontVariationSettings: "'FILL' 1" }}>star</span>
+                  ))}
+                </div>
+                <p className="text-[#131b2e] leading-relaxed mb-5">« {t.text} »</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[#e2e7ff]">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#006b2c] to-[#00873a] flex items-center justify-center text-white font-bold">
+                    {t.initial}
+                  </div>
+                  <div>
+                    <div className="font-bold text-[#131b2e] text-sm">{t.name}</div>
+                    <div className="text-xs text-[#3e4a3d]">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* PAYMENT TRUST BANNER */}
-      <section className="py-20 px-8">
-        <div className="max-w-7xl mx-auto bg-[#283044] rounded-[3rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_rgba(0,107,44,0.1),_transparent,_transparent)] pointer-events-none" />
+      {/* ══════════════ PAYMENT TRUST ══════════════ */}
+      <section className="py-20 px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto bg-gradient-to-br from-[#131b2e] to-[#283044] rounded-[2.5rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(127,252,151,0.12),transparent_60%)] pointer-events-none" />
 
           <div className="w-full md:w-1/2 relative z-10 text-center md:text-left">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-              Payez en toute sécurité avec Airtel Money &amp; Moov Money
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-5 leading-tight">
+              Payez en toute sécurité, en <span className="text-[#7ffc97]">FCFA</span>
             </h2>
-            <p className="text-slate-400 text-lg mb-10 max-w-lg mx-auto md:mx-0">
-              Le premier écosystème de commerce digital au Gabon intégrant nativement les paiements locaux pour une expérience sans friction.
+            <p className="text-slate-300 text-base md:text-lg mb-8 max-w-lg mx-auto md:mx-0">
+              Paiements locaux intégrés nativement — Airtel Money, Moov Money, cartes Visa/Mastercard. Chiffrement de bout en bout.
             </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4">
-              <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl flex items-center gap-4">
-                <span className="material-symbols-outlined text-[#7ffc97] text-3xl">verified_user</span>
-                <div className="text-left">
-                  <div className="text-white font-bold">Sécurité 100%</div>
-                  <div className="text-slate-500 text-xs">Paiements cryptés</div>
-                </div>
-              </div>
-              <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl flex items-center gap-4">
-                <span className="material-symbols-outlined text-[#7ffc97] text-3xl">local_shipping</span>
-                <div className="text-left">
-                  <div className="text-white font-bold">Livraison Rapide</div>
-                  <div className="text-slate-500 text-xs">Partout au Gabon</div>
-                </div>
-              </div>
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <PaymentBadge icon="phone_iphone" label="Airtel Money" tint="#FF0000" />
+              <PaymentBadge icon="phone_iphone" label="Moov Money" tint="#FFC300" />
+              <PaymentBadge icon="credit_card"  label="Visa / Mastercard" tint="#006b2c" />
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 relative">
-            <div className="relative z-10 mx-auto w-64 md:w-80 aspect-[9/19] bg-slate-900 rounded-[3rem] border-[8px] border-slate-800 shadow-2xl overflow-hidden">
-              <img
-                alt="Mobile App"
-                className="w-full h-full object-cover opacity-80"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPu6TD8HCR6pvdrIAsaZcjkm5BRh39SAiK7U75yoZTXB0Vj4FXmzk7TH4i15Wj2xPnjz3mKhb1jpTM6y5FsE_SNs4OCzgUjGjfvE1X2dBD0W2JOJcPGsQJAw76H8FdHV2TlOd_luEmQrK6vTK1WVJ-DnDUkCH4fAoAvwxwTUC8nXwYFbwGXuT0eHuKqGj10UwFVKinWlviw-AB5BX_rkaH-kMycs8efXA34mW2Y9Grc22i2E0uWu1xPMU9ptFcn2pJ-ygrlD1XOVMs"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-0 w-full px-6 text-center">
-                <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
-                <div className="text-white text-sm font-bold">Transaction Réussie</div>
+          <div className="w-full md:w-1/2 relative z-10">
+            <div className="relative mx-auto w-56 md:w-72 aspect-[9/19] bg-slate-950 rounded-[2.5rem] border-[8px] border-slate-800 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-[#006b2c]/30 via-transparent to-[#00873a]/40" />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-5 bg-slate-900 rounded-b-2xl" />
+              <div className="absolute top-14 left-0 w-full px-5 space-y-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                  <div className="text-[10px] text-white/60 mb-1">Abonnement</div>
+                  <div className="text-sm font-bold text-white">Netflix Premium · 1 mois</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                  <div className="text-[10px] text-white/60 mb-1">Total</div>
+                  <div className="text-xl font-extrabold text-[#7ffc97]">4 500 FCFA</div>
+                </div>
+              </div>
+              <div className="absolute bottom-10 left-0 w-full px-5 text-center">
+                <div className="bg-[#7ffc97] text-[#003d19] py-3 rounded-xl font-bold text-sm mb-3 flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  Paiement confirmé
+                </div>
+                <div className="text-[10px] text-white/60">Airtel Money Gabon</div>
               </div>
             </div>
-            <div className="absolute top-1/4 -left-12 bg-white p-4 rounded-2xl shadow-xl z-20 flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#7ffc97] rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#006b2c]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              </div>
-              <div>
-                <div className="text-[#131b2e] font-bold text-sm">Paiement reçu</div>
-                <div className="text-[#3e4a3d] text-[10px]">Airtel Money Gabon</div>
-              </div>
-            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════ CTA FINAL ══════════════ */}
+      <section className="py-20 px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#131b2e] mb-4 leading-tight">
+            Prêt à débloquer vos abonnements ?
+          </h2>
+          <p className="text-lg text-[#3e4a3d] mb-8 max-w-2xl mx-auto">
+            Rejoignez plus de 10 000 clients au Gabon et commencez à profiter de vos plateformes préférées dès aujourd'hui.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href={`/${locale}/shop`}
+              className="inline-flex items-center gap-2 bg-[#006b2c] hover:bg-[#00873a] text-white px-8 py-4 rounded-xl font-bold shadow-xl shadow-[#006b2c]/30 hover:scale-105 transition-all"
+            >
+              <span className="material-symbols-outlined text-xl">shopping_bag</span>
+              Voir les abonnements
+            </Link>
+            <Link
+              href={`/${locale}/auth/register`}
+              className="inline-flex items-center gap-2 border-2 border-[#006b2c] text-[#006b2c] px-8 py-4 rounded-xl font-bold hover:bg-[#006b2c] hover:text-white transition-all"
+            >
+              Créer un compte gratuit
+            </Link>
           </div>
         </div>
       </section>
@@ -237,19 +442,42 @@ export default async function HomePage() {
   )
 }
 
-function Stars({ count, total = 5 }: { count: number; total?: number }) {
+// ── Sub-components ───────────────────────────────────────────────────────────
+
+function PaymentBadge({ icon, label, tint }: { icon: string; label: string; tint: string }) {
   return (
-    <>
-      {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          className={`material-symbols-outlined text-sm ${i < count ? 'text-amber-500' : 'text-slate-300'}`}
-          style={i < count ? { fontVariationSettings: "'FILL' 1" } : undefined}
-        >
-          star
+    <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
+      <span
+        className="w-8 h-8 rounded-lg flex items-center justify-center"
+        style={{ backgroundColor: `${tint}30` }}
+      >
+        <span className="material-symbols-outlined text-base" style={{ color: tint === '#FFC300' ? '#FFC300' : '#7ffc97' }}>
+          {icon}
         </span>
-      ))}
-    </>
+      </span>
+      <span className="text-white font-semibold text-sm">{label}</span>
+    </div>
+  )
+}
+
+function EmptyState({ locale }: { locale: string }) {
+  return (
+    <div className="bg-white border-2 border-dashed border-[#e2e7ff] rounded-3xl p-16 text-center">
+      <div className="w-20 h-20 bg-[#f2f3ff] rounded-full flex items-center justify-center mx-auto mb-5">
+        <span className="material-symbols-outlined text-[#006b2c] text-4xl">inventory_2</span>
+      </div>
+      <h3 className="text-xl font-bold text-[#131b2e] mb-2">Aucun produit disponible pour le moment</h3>
+      <p className="text-sm text-[#3e4a3d] max-w-sm mx-auto mb-6">
+        Notre catalogue est en cours de constitution. Revenez bientôt pour découvrir nos premiers abonnements !
+      </p>
+      <Link
+        href={`/${locale}/shop`}
+        className="inline-flex items-center gap-2 text-[#006b2c] font-semibold hover:underline"
+      >
+        Explorer la boutique
+        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+      </Link>
+    </div>
   )
 }
 
@@ -262,7 +490,7 @@ function ProductCard({
     title_fr: string
     title_en: string
     price: number
-    images: string[]
+    images: string[] | null
     space: string
     categories: { name_fr: string; name_en: string } | null
   }
@@ -272,8 +500,11 @@ function ProductCard({
   const href = `/${locale}/${product.space === 'official' ? 'shop' : 'marketplace'}/${product.id}`
 
   return (
-    <div className="bg-white rounded-3xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col">
-      <div className="aspect-video relative overflow-hidden">
+    <Link
+      href={href}
+      className="bg-white border border-[#e2e7ff] rounded-2xl overflow-hidden group hover:shadow-xl hover:border-[#006b2c] transition-all duration-300 flex flex-col"
+    >
+      <div className="aspect-[4/3] relative overflow-hidden bg-[#f2f3ff]">
         {product.images?.[0] ? (
           <img
             src={product.images[0]}
@@ -281,89 +512,31 @@ function ProductCard({
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-[#eaedff] flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center">
             <span className="material-symbols-outlined text-[#006b2c] text-6xl">inventory_2</span>
           </div>
         )}
         {product.space === 'official' && (
-          <div className="absolute top-4 left-4 bg-[#82f5c1] text-[#00714e] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+          <div className="absolute top-3 left-3 bg-[#7ffc97] text-[#003d19] px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
             Officiel
           </div>
         )}
       </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="p-5 flex flex-col flex-grow">
+        <div className="flex items-center gap-1.5 mb-2">
           <span className="text-[#3e4a3d] text-xs font-medium">GaboShop</span>
           <span className="material-symbols-outlined text-[#006b2c] text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
         </div>
-        <Link href={href}>
-          <h3 className="text-xl font-bold mb-2 group-hover:text-[#006b2c] transition-colors">{title}</h3>
-        </Link>
-        <div className="flex items-center gap-1 mb-4">
-          <Stars count={5} />
-          <span className="text-xs text-[#3e4a3d] ml-1">(--)</span>
-        </div>
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-2xl font-bold text-[#006b2c]">{product.price.toLocaleString()} FCFA</span>
-          <Link href={href} className="bg-[#e2e7ff] p-3 rounded-xl hover:bg-[#006b2c] hover:text-white transition-all">
-            <span className="material-symbols-outlined">add_shopping_cart</span>
-          </Link>
+        <h3 className="text-base font-bold mb-3 group-hover:text-[#006b2c] transition-colors line-clamp-2">{title}</h3>
+        <div className="mt-auto flex items-center justify-between pt-3 border-t border-[#e2e7ff]">
+          <span className="text-xl font-extrabold text-[#006b2c]">
+            {product.price.toLocaleString()} <span className="text-xs font-semibold text-[#3e4a3d]">FCFA</span>
+          </span>
+          <span className="bg-[#f2f3ff] p-2.5 rounded-xl group-hover:bg-[#006b2c] group-hover:text-white transition-all">
+            <span className="material-symbols-outlined text-lg">arrow_forward</span>
+          </span>
         </div>
       </div>
-    </div>
-  )
-}
-
-function StaticProductCard({
-  img,
-  badge,
-  seller,
-  title,
-  stars,
-  reviews,
-  price,
-  href,
-}: {
-  img: string
-  badge?: string
-  seller: string
-  title: string
-  stars: number
-  reviews: number
-  price: string
-  href: string
-}) {
-  return (
-    <div className="bg-white rounded-3xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col">
-      <div className="aspect-video relative overflow-hidden">
-        <img
-          src={img}
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-        {badge && (
-          <div className="absolute top-4 left-4 bg-[#82f5c1] text-[#00714e] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            {badge}
-          </div>
-        )}
-      </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[#3e4a3d] text-xs font-medium">{seller}</span>
-          <span className="material-symbols-outlined text-[#006b2c] text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-        </div>
-        <h3 className="text-xl font-bold mb-2 group-hover:text-[#006b2c] transition-colors">{title}</h3>
-        <div className="flex items-center gap-1 mb-4">
-          <Stars count={stars} />
-          <span className="text-xs text-[#3e4a3d] ml-1">({reviews})</span>
-        </div>
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-2xl font-bold text-[#006b2c]">{price}</span>
-          <Link href={href} className="bg-[#e2e7ff] p-3 rounded-xl hover:bg-[#006b2c] hover:text-white transition-all">
-            <span className="material-symbols-outlined">add_shopping_cart</span>
-          </Link>
-        </div>
-      </div>
-    </div>
+    </Link>
   )
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCartStore } from '@/store/cart'
 import { useRouter, usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -11,9 +11,17 @@ export default function Header() {
   const locale = useLocale()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [scrolled, setScrolled] = useState(false)
   const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0))
   const router = useRouter()
   const pathname = usePathname()
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   function switchLocale() {
     const next = locale === 'fr' ? 'en' : 'fr'
@@ -24,24 +32,40 @@ export default function Header() {
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (search.trim()) router.push(`/${locale}/shop?q=${encodeURIComponent(search)}`)
+    if (search.trim()) {
+      router.push(`/${locale}/shop?q=${encodeURIComponent(search.trim())}`)
+      setMobileOpen(false)
+    }
   }
 
   const navLinks = [
-    { href: `/${locale}/shop`, label: 'Boutique' },
-    { href: `/${locale}/marketplace`, label: 'Marketplace' },
+    { href: `/${locale}/shop`,        label: locale === 'fr' ? 'Boutique'    : 'Shop'        },
+    { href: `/${locale}/marketplace`, label: locale === 'fr' ? 'Marketplace' : 'Marketplace' },
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#faf8ff]/80 backdrop-blur-md border-b border-[#f2f3ff]">
-      <div className="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+    <nav
+      className={cn(
+        'sticky top-0 z-50 transition-all duration-300',
+        scrolled
+          ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-[#e2e7ff]'
+          : 'bg-[#faf8ff]/80 backdrop-blur-md border-b border-transparent'
+      )}
+    >
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3.5">
 
-        {/* Left: Logo + nav links */}
-        <div className="flex items-center gap-8">
-          <Link href={`/${locale}`} className="text-2xl font-bold tracking-tight text-[#006b2c]">
-            GaboShop
+        {/* ── Logo + nav ── */}
+        <div className="flex items-center gap-10">
+          <Link href={`/${locale}`} className="flex items-center gap-2 group">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#006b2c] to-[#00873a] flex items-center justify-center shadow-md shadow-[#006b2c]/20 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-white" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+            </span>
+            <span className="text-xl font-extrabold tracking-tight">
+              <span className="text-[#006b2c]">Gabo</span><span className="text-[#131b2e]">Shop</span>
+            </span>
           </Link>
-          <div className="hidden md:flex items-center gap-6">
+
+          <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
               return (
@@ -49,10 +73,10 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'font-medium transition-colors duration-200',
+                    'relative px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200',
                     isActive
-                      ? 'text-[#006b2c] font-bold border-b-2 border-[#006b2c] pb-1'
-                      : 'text-[#131b2e] hover:text-[#00873a]'
+                      ? 'text-[#006b2c] bg-[#7ffc97]/20'
+                      : 'text-[#131b2e] hover:text-[#006b2c] hover:bg-[#f2f3ff]'
                   )}
                 >
                   {link.label}
@@ -62,90 +86,115 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Right: Search + actions */}
-        <div className="flex items-center gap-6">
-          <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-[#f2f3ff] px-4 py-2 rounded-full">
+        {/* ── Actions ── */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop search */}
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex items-center bg-[#f2f3ff] hover:bg-white border border-transparent hover:border-[#e2e7ff] focus-within:bg-white focus-within:border-[#006b2c] focus-within:ring-2 focus-within:ring-[#006b2c]/20 px-4 py-2 rounded-full transition-all"
+          >
             <span className="material-symbols-outlined text-[#3e4a3d] mr-2" style={{ fontSize: '18px' }}>search</span>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-48 text-[#131b2e] placeholder:text-[#3e4a3d]"
-              placeholder="Rechercher..."
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-36 lg:w-56 text-[#131b2e] placeholder:text-[#3e4a3d]/60"
+              placeholder={locale === 'fr' ? 'Rechercher un abonnement…' : 'Search a subscription…'}
             />
           </form>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={switchLocale}
-              className="text-[#3e4a3d] font-medium text-sm cursor-pointer hover:text-[#006b2c] transition-colors"
-            >
-              FR/EN
-            </button>
+          {/* Language switcher */}
+          <button
+            onClick={switchLocale}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full text-[#131b2e] hover:bg-[#f2f3ff] hover:text-[#006b2c] transition-all text-sm font-semibold"
+            title={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>language</span>
+            {locale.toUpperCase()}
+          </button>
 
-            <Link href={`/${locale}/checkout`} className="relative p-2 text-[#131b2e] hover:scale-95 duration-150 ease-in-out">
-              <span className="material-symbols-outlined">shopping_cart</span>
-              {itemCount > 0 && (
-                <span className="absolute top-0 right-0 bg-[#006b2c] text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
+          {/* Cart */}
+          <Link
+            href={`/${locale}/checkout`}
+            className="relative p-2.5 rounded-full text-[#131b2e] hover:bg-[#f2f3ff] hover:text-[#006b2c] transition-all"
+            aria-label="Panier"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>shopping_cart</span>
+            {itemCount > 0 && (
+              <span className="absolute top-1 right-1 bg-[#006b2c] text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                {itemCount > 9 ? '9+' : itemCount}
+              </span>
+            )}
+          </Link>
 
-            <Link
-              href={`/${locale}/auth/login`}
-              className="hidden md:block bg-[#006b2c] text-white px-6 py-2 rounded-xl font-semibold hover:scale-95 duration-150 ease-in-out"
-            >
-              Connexion
-            </Link>
+          {/* Auth CTA */}
+          <Link
+            href={`/${locale}/auth/login`}
+            className="hidden md:inline-flex items-center gap-1.5 bg-[#006b2c] hover:bg-[#00873a] text-white px-5 py-2.5 rounded-full font-semibold text-sm shadow-md shadow-[#006b2c]/20 hover:shadow-lg hover:shadow-[#006b2c]/30 hover:scale-[1.02] transition-all"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>login</span>
+            {locale === 'fr' ? 'Connexion' : 'Sign in'}
+          </Link>
 
-            <button
-              className="md:hidden p-2 text-[#131b2e]"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              <span className="material-symbols-outlined">{mobileOpen ? 'close' : 'menu'}</span>
-            </button>
-          </div>
+          {/* Mobile toggle */}
+          <button
+            className="lg:hidden p-2 rounded-full text-[#131b2e] hover:bg-[#f2f3ff] transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Menu"
+          >
+            <span className="material-symbols-outlined">{mobileOpen ? 'close' : 'menu'}</span>
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* ── Mobile menu ── */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#faf8ff] px-8 py-4 flex flex-col gap-3 border-t border-[#f2f3ff]">
-          <form onSubmit={handleSearch} className="flex items-center bg-[#f2f3ff] px-4 py-2 rounded-full">
+        <div className="lg:hidden bg-white border-t border-[#e2e7ff] px-4 sm:px-6 py-5 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-200">
+          <form onSubmit={handleSearch} className="flex items-center bg-[#f2f3ff] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#006b2c]/20 px-4 py-2.5 rounded-full transition-all">
             <span className="material-symbols-outlined text-[#3e4a3d] mr-2" style={{ fontSize: '18px' }}>search</span>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm flex-1 text-[#131b2e] placeholder:text-[#3e4a3d]"
-              placeholder="Rechercher..."
+              className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm flex-1 text-[#131b2e] placeholder:text-[#3e4a3d]/60"
+              placeholder={locale === 'fr' ? 'Rechercher…' : 'Search…'}
             />
           </form>
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium py-2 text-[#131b2e] hover:text-[#006b2c]"
-              onClick={() => setMobileOpen(false)}
+
+          <div className="flex flex-col gap-1 py-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-semibold py-3 px-4 rounded-xl text-[#131b2e] hover:bg-[#f2f3ff] hover:text-[#006b2c] transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <button
+              onClick={() => { switchLocale(); setMobileOpen(false) }}
+              className="flex items-center gap-2 text-sm font-semibold py-3 px-4 rounded-xl text-[#131b2e] hover:bg-[#f2f3ff] hover:text-[#006b2c] transition-colors text-left"
             >
-              {link.label}
-            </Link>
-          ))}
-          <div className="flex gap-2 pt-2 border-t border-[#f2f3ff]">
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>language</span>
+              {locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+            </button>
+          </div>
+
+          <div className="flex gap-2 pt-3 border-t border-[#e2e7ff]">
             <Link
               href={`/${locale}/auth/register`}
-              className="flex-1 text-center py-2 text-sm border border-[#006b2c] text-[#006b2c] rounded-full font-medium"
+              className="flex-1 text-center py-3 text-sm border-2 border-[#006b2c] text-[#006b2c] rounded-full font-semibold hover:bg-[#006b2c] hover:text-white transition-colors"
               onClick={() => setMobileOpen(false)}
             >
-              S&apos;inscrire
+              {locale === 'fr' ? "S'inscrire" : 'Sign up'}
             </Link>
             <Link
               href={`/${locale}/auth/login`}
-              className="flex-1 text-center py-2 text-sm bg-[#006b2c] text-white rounded-full font-medium"
+              className="flex-1 text-center py-3 text-sm bg-[#006b2c] text-white rounded-full font-semibold hover:bg-[#00873a] transition-colors"
               onClick={() => setMobileOpen(false)}
             >
-              Connexion
+              {locale === 'fr' ? 'Connexion' : 'Sign in'}
             </Link>
           </div>
         </div>
