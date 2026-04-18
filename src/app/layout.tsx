@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Manrope, Inter } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' })
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-[#faf8ff] font-[family-name:var(--font-inter)] antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   )
