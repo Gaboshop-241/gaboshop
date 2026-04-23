@@ -1,6 +1,6 @@
 import LegalPage from '@/components/layout/LegalPage'
 
-export const metadata = { title: 'Politique de retour — GaboShop' }
+export const metadata = { title: 'Politique de retour — Akiba' }
 
 export default function ReturnsPage() {
   return (
@@ -22,9 +22,9 @@ export default function ReturnsPage() {
           "Changement d'avis après livraison réussie (nature digitale du produit).",
           "Blocage du compte au-delà de 48h suivant la livraison.",
         ]},
-        { title: '4. Procédure', body: "Contactez notre support à support@gaboshop.ga ou via WhatsApp en précisant votre numéro de commande et la nature du problème. Une réponse vous sera apportée sous 4 heures ouvrées." },
+        { title: '4. Procédure', body: "Contactez notre support à support@akiba.ga ou via WhatsApp en précisant votre numéro de commande et la nature du problème. Une réponse vous sera apportée sous 4 heures ouvrées." },
         { title: '5. Modalités de remboursement', body: "En cas d'acceptation, le remboursement est effectué sous 72 heures via le même moyen de paiement utilisé lors de la commande (Airtel Money, Moov Money, carte). Aucun frais de gestion n'est prélevé." },
-        { title: '6. Remplacement', body: "GaboShop peut, au choix de l'Utilisateur, remplacer un produit défectueux plutôt que procéder à un remboursement. Le remplacement est généralement effectué sous 15 minutes." },
+        { title: '6. Remplacement', body: "Akiba peut, au choix de l'Utilisateur, remplacer un produit défectueux plutôt que procéder à un remboursement. Le remplacement est généralement effectué sous 15 minutes." },
       ]}
     />
   )

@@ -2,14 +2,14 @@ import Link from 'next/link'
 import { getLocale } from 'next-intl/server'
 
 export const metadata = {
-  title: 'Aide & Support — GaboShop',
+  title: 'Aide & Support — Akiba',
   description: 'Trouvez des réponses à vos questions et contactez notre support.',
 }
 
 const FAQ = [
   { q: "En combien de temps reçois-je mon abonnement ?",    a: "La plupart des abonnements sont livrés par email en moins de 5 minutes après confirmation du paiement. Pour certaines commandes complexes, le délai peut aller jusqu'à 30 minutes." },
   { q: "Comment puis-je payer ?",                            a: "Nous acceptons Airtel Money, Moov Money, les cartes Visa et Mastercard, ainsi que les virements bancaires pour les professionnels." },
-  { q: "Les abonnements sont-ils authentiques ?",            a: "Oui, 100%. GaboShop est partenaire officiel de plusieurs plateformes, et tous nos comptes sont garantis authentiques, neufs et fonctionnels." },
+  { q: "Les abonnements sont-ils authentiques ?",            a: "Oui, 100%. Akiba est partenaire officiel de plusieurs plateformes, et tous nos comptes sont garantis authentiques, neufs et fonctionnels." },
   { q: "Que se passe-t-il si un compte ne fonctionne pas ?", a: "Contactez notre support dans les 24h suivant la réception. Nous remplaçons ou remboursons tout compte défectueux sans frais." },
   { q: "Puis-je vendre mes propres produits ?",              a: "Oui ! Créez un compte vendeur depuis la page d'inscription et ouvrez votre boutique sur notre Marketplace local." },
 ]

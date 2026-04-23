@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { useState } from 'react'
+import { PaymentLogosRow } from '@/components/PaymentLogos'
 
 export default function Footer() {
   const locale = useLocale()
@@ -47,11 +48,11 @@ export default function Footer() {
 
         {/* Col 1: Brand */}
         <div className="md:col-span-1">
-          <Link href={`/${locale}`} className="flex items-center gap-2 mb-5">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#006b2c] to-[#00873a] flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined text-white" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+          <Link href={`/${locale}`} className="flex items-center gap-2 mb-5 group">
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-md ring-1 ring-white/10 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
             </span>
-            <span className="text-xl font-extrabold tracking-tight text-white">GaboShop</span>
+            <span className="text-xl font-extrabold tracking-tight text-white">Akiba</span>
           </Link>
           <p className="text-sm leading-relaxed mb-6">
             La plateforme de référence pour vos abonnements digitaux au Gabon. Livraison instantanée, paiement local, support 7j/7.
@@ -78,11 +79,11 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Explorer</h4>
           <ul className="space-y-3 text-sm">
-            <li><Link href={`/${locale}/shop`}                         className="hover:text-white transition-colors">Boutique Officielle</Link></li>
-            <li><Link href={`/${locale}/marketplace`}                  className="hover:text-white transition-colors">Marketplace Local</Link></li>
+            <li><Link href={`/${locale}/shop`}                         className="hover:text-white transition-colors">Akiba Store</Link></li>
+            <li><Link href={`/${locale}/marketplace`}                  className="hover:text-white transition-colors">Akiba Market</Link></li>
             <li><Link href={`/${locale}/shop?category=streaming`}      className="hover:text-white transition-colors">Abonnements streaming</Link></li>
             <li><Link href={`/${locale}/shop?category=music`}          className="hover:text-white transition-colors">Abonnements musique</Link></li>
-            <li><Link href={`/${locale}/auth/register?vendor=1`}       className="hover:text-white transition-colors">Vendre sur GaboShop</Link></li>
+            <li><Link href={`/${locale}/become-vendor`}                className="hover:text-white transition-colors">Devenir revendeur</Link></li>
           </ul>
         </div>
 
@@ -127,12 +128,7 @@ export default function Footer() {
           )}
 
           <h4 className="text-white font-bold mb-3 text-sm uppercase tracking-wider">Paiements acceptés</h4>
-          <div className="flex flex-wrap gap-2">
-            <PaymentLogo label="Airtel" bg="#E60000" />
-            <PaymentLogo label="Moov"   bg="#FDB913" fg="#002E5D" />
-            <PaymentLogo label="VISA"   bg="#1A1F71" />
-            <PaymentLogo label="MC"     bg="#EB001B" title="Mastercard" />
-          </div>
+          <PaymentLogosRow />
         </div>
       </div>
 
@@ -140,7 +136,7 @@ export default function Footer() {
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500">
-            © 2026 GaboShop. Tous droits réservés. · Fait avec <span className="text-[#7ffc97]">♥</span> à Libreville.
+            © 2026 Akiba. Tous droits réservés. · Fait avec <span className="text-[#7ffc97]">♥</span> à Libreville.
           </p>
           <div className="flex flex-wrap justify-center gap-5 text-xs font-medium">
             <Link href={`/${locale}/legal/privacy`}  className="hover:text-white transition-colors">Confidentialité</Link>
@@ -150,17 +146,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
-}
-
-function PaymentLogo({ label, bg, fg = '#FFFFFF', title }: { label: string; bg: string; fg?: string; title?: string }) {
-  return (
-    <div
-      className="h-9 w-14 rounded-lg flex items-center justify-center font-black text-[11px] tracking-tight shadow-sm"
-      style={{ backgroundColor: bg, color: fg }}
-      title={title || label}
-    >
-      {label}
-    </div>
   )
 }

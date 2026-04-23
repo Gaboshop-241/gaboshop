@@ -135,7 +135,7 @@ export default function DashboardSidebar({ role, vendorName, isVerified, userIni
           </span>
           Déconnexion
         </button>
-        <p className="text-[10px] text-slate-600 text-center mt-3">GaboShop v2.4.0</p>
+        <p className="text-[10px] text-slate-600 text-center mt-3">Akiba v2.4.0</p>
       </div>
     </aside>
   )

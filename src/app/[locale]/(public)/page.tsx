@@ -1,6 +1,8 @@
 import { getLocale } from 'next-intl/server'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { PaymentLogosRow } from '@/components/PaymentLogos'
+import { PlatformsMarquee } from '@/components/PlatformsMarquee'
 
 // ── Static content (production: move to i18n messages) ───────────────────────
 
@@ -30,7 +32,7 @@ const STATS = [
 ]
 
 const TESTIMONIALS = [
-  { name: 'Marie Obame',       role: 'Cliente à Libreville', initial: 'M', text: 'Mon Netflix reçu en 2 minutes, aucun souci. Je recommande GaboShop à toute ma famille.' },
+  { name: 'Marie Obame',       role: 'Cliente à Libreville', initial: 'M', text: 'Mon Netflix reçu en 2 minutes, aucun souci. Je recommande Akiba à toute ma famille.' },
   { name: 'Jean-Paul Nze',     role: 'Abonné Premium',       initial: 'J', text: 'Des prix imbattables et un support réactif. J’ai fait des économies énormes cette année.' },
   { name: 'Sandrine Boussougou', role: 'Étudiante',          initial: 'S', text: 'Parfait pour mon Spotify étudiant. Le paiement Airtel Money est super pratique !' },
 ]
@@ -57,11 +59,18 @@ export default async function HomePage() {
     <div className="bg-[#faf8ff] text-[#131b2e] selection:bg-[#7ffc97] selection:text-[#002109]">
 
       {/* ══════════════ HERO ══════════════ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#003d19] via-[#006b2c] to-[#00873a] text-white">
-        {/* Decorative radial glow */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#001d0c] via-[#003d19] to-[#006b2c] text-white">
+        {/* Background photo */}
         <div className="pointer-events-none absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1920&q=80"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-luminosity"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#001d0c]/90 via-[#003d19]/85 to-[#006b2c]/80" />
           <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full bg-[#7ffc97]/20 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-[32rem] h-[32rem] rounded-full bg-[#00873a]/40 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-[32rem] h-[32rem] rounded-full bg-[#fff170]/10 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -83,12 +92,18 @@ export default async function HomePage() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6">
               Tous vos abonnements<br />
-              <span className="bg-gradient-to-r from-[#7ffc97] to-white bg-clip-text text-transparent">digitaux, au Gabon.</span>
+              <span className="bg-gradient-to-r from-[#7ffc97] via-[#fff170] to-white bg-clip-text text-transparent">digitaux, au Gabon.</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-[#d7fde1] mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Netflix, Spotify, Disney+, YouTube Premium… Achetez vos abonnements favoris en FCFA, livraison instantanée par email, paiement sécurisé Airtel Money & Moov Money.
+            <p className="text-lg sm:text-xl text-[#d7fde1] mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Payez en toute sécurité en <span className="font-bold text-white">FCFA</span> avec les moyens de paiement locaux. Livraison instantanée par email, support local 7j/7.
             </p>
+
+            {/* Real payment logos */}
+            <div className="mb-8 flex flex-col sm:flex-row items-center lg:items-center gap-3 justify-center lg:justify-start">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/60">Paiements acceptés</span>
+              <PaymentLogosRow />
+            </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-10">
@@ -103,7 +118,7 @@ export default async function HomePage() {
                 href={`/${locale}/marketplace`}
                 className="inline-flex items-center gap-2 border-2 border-white/50 text-white px-7 py-4 rounded-xl font-bold text-base hover:bg-white/10 hover:border-white transition-all"
               >
-                Marketplace local
+                Akiba Market
               </Link>
             </div>
 
@@ -185,25 +200,13 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Platform strip */}
+        {/* Platform strip — auto-scroll marquee with hover pause */}
         <div className="relative border-t border-white/10 bg-black/20 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
             <p className="text-center text-xs font-semibold uppercase tracking-widest text-white/50 mb-4">
               Plateformes disponibles
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-              {PLATFORMS.map((p) => (
-                <div key={p.name} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">
-                  <span
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-white font-black text-[10px]"
-                    style={{ backgroundColor: p.color }}
-                  >
-                    {p.initial}
-                  </span>
-                  <span className="text-sm font-medium text-white/90">{p.name}</span>
-                </div>
-              ))}
-            </div>
+            <PlatformsMarquee platforms={PLATFORMS} />
           </div>
         </div>
       </section>
@@ -212,7 +215,7 @@ export default async function HomePage() {
       <section className="py-20 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
-            <span className="text-[#006b2c] font-bold tracking-widest text-xs uppercase mb-2 block">Pourquoi GaboShop</span>
+            <span className="text-[#006b2c] font-bold tracking-widest text-xs uppercase mb-2 block">Pourquoi Akiba</span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#131b2e] leading-tight max-w-2xl mx-auto">
               La manière la plus simple de s'abonner, au Gabon
             </h2>
@@ -253,9 +256,9 @@ export default async function HomePage() {
               <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined text-white text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>shield_with_heart</span>
               </div>
-              <h2 className="text-3xl font-extrabold text-white mb-3">Boutique Officielle</h2>
+              <h2 className="text-3xl font-extrabold text-white mb-3">Akiba Store</h2>
               <p className="text-[#d7fde1] max-w-sm leading-relaxed">
-                Abonnements certifiés Netflix, Spotify, Disney+ et plus. Garantie 100% GaboShop, livraison en 5 min.
+                Abonnements certifiés Netflix, Spotify, Disney+ et plus. Garantie 100% Akiba, livraison en 5 min.
               </p>
             </div>
             <Link
@@ -274,9 +277,9 @@ export default async function HomePage() {
               <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined text-[#82f5c1] text-3xl">groups</span>
               </div>
-              <h2 className="text-3xl font-extrabold text-white mb-3">Marketplace Local</h2>
+              <h2 className="text-3xl font-extrabold text-white mb-3">Akiba Market</h2>
               <p className="text-slate-400 max-w-sm leading-relaxed">
-                Achetez et vendez en toute sécurité avec nos vendeurs partenaires à travers tout le Gabon.
+                Achetez et vendez en toute sécurité avec nos revendeurs partenaires à travers tout le Gabon.
               </p>
             </div>
             <Link
@@ -524,7 +527,7 @@ function ProductCard({
       </div>
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex items-center gap-1.5 mb-2">
-          <span className="text-[#3e4a3d] text-xs font-medium">GaboShop</span>
+          <span className="text-[#3e4a3d] text-xs font-medium">Akiba</span>
           <span className="material-symbols-outlined text-[#006b2c] text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
         </div>
         <h3 className="text-base font-bold mb-3 group-hover:text-[#006b2c] transition-colors line-clamp-2">{title}</h3>

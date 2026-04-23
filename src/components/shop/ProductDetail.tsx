@@ -190,7 +190,7 @@ export default function ProductDetail({
             <div className="flex items-center gap-3 py-1 flex-wrap">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f2f3ff] rounded-lg">
                 <span className="w-2 h-2 bg-[#006b2c] rounded-full animate-pulse" />
-                <span className="text-sm font-semibold text-[#131b2e]">GaboShop Officiel</span>
+                <span className="text-sm font-semibold text-[#131b2e]">Akiba Officiel</span>
                 <span
                   className="material-symbols-outlined text-[#006b2c] text-base"
                   style={{ fontVariationSettings: "'FILL' 1" }}

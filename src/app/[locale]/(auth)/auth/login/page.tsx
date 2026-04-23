@@ -17,7 +17,7 @@ export default function LoginPage() {
   const locale = useLocale()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') || `/${locale}/client`
+  const explicitRedirect = searchParams.get('redirectTo')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -38,8 +38,24 @@ export default function LoginPage() {
           ? 'Veuillez confirmer votre email avant de vous connecter.'
           : error.message
       )
-    } else if (data.user) {
-      router.push(redirectTo)
+      setLoading(false)
+      return
+    }
+    if (data.user) {
+      let target = explicitRedirect
+      if (!target) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .maybeSingle()
+        const role = (profile?.role as string | undefined) ?? 'client'
+        target =
+          role === 'admin'  ? `/${locale}/admin`  :
+          role === 'vendor' ? `/${locale}/vendor` :
+                              `/${locale}/client`
+      }
+      router.push(target)
       router.refresh()
     }
     setLoading(false)
@@ -48,10 +64,11 @@ export default function LoginPage() {
   async function handleGoogleLogin() {
     setGoogleLoading(true)
     const supabase = createClient()
+    const next = explicitRedirect || `/${locale}/client`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next)}`,
       },
     })
     if (error) {
@@ -76,19 +93,22 @@ export default function LoginPage() {
 
         <div className="relative z-10 flex flex-col justify-between p-12 lg:p-20 text-white h-full">
           {/* Logo */}
-          <div>
-            <span className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-manrope)' }}>
-              Gabo<span className="text-[#7ffc97]">Shop</span>
+          <Link href={`/${locale}`} className="inline-flex items-center gap-2.5 group">
+            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-lg ring-1 ring-white/30 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '22px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
             </span>
-          </div>
+            <span className="text-3xl font-extrabold tracking-tight text-white" style={{ fontFamily: 'var(--font-manrope)' }}>
+              Akiba
+            </span>
+          </Link>
 
           {/* Headline */}
           <div className="max-w-xl space-y-5">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight" style={{ fontFamily: 'var(--font-manrope)' }}>
-              Bienvenue sur GaboShop
+              Bon retour sur Akiba
             </h1>
             <p className="text-xl lg:text-2xl text-[#7ffc97] opacity-90 leading-relaxed">
-              La première marketplace hybride du Gabon
+              Vos abonnements digitaux, payés en FCFA, livrés en 5 minutes.
             </p>
           </div>
 
@@ -110,9 +130,12 @@ export default function LoginPage() {
       <section className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 lg:p-24 bg-[#faf8ff]">
         {/* Mobile logo */}
         <div className="md:hidden self-start mb-12">
-          <Link href={`/${locale}`}>
-            <span className="text-2xl font-extrabold tracking-tight text-[#006b2c]" style={{ fontFamily: 'var(--font-manrope)' }}>
-              Gabo<span className="text-[#131b2e]">Shop</span>
+          <Link href={`/${locale}`} className="inline-flex items-center gap-2">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '18px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
+            </span>
+            <span className="text-2xl font-extrabold tracking-tight text-[#131b2e]" style={{ fontFamily: 'var(--font-manrope)' }}>
+              Akiba
             </span>
           </Link>
         </div>
@@ -231,10 +254,11 @@ export default function LoginPage() {
         </div>
 
         {/* Legal */}
-        <div className="mt-auto pt-12 flex gap-6 opacity-40 text-[10px] uppercase tracking-widest text-[#3e4a3d]">
-          <span>© 2025 GaboShop</span>
-          <Link href={`/${locale}/privacy`} className="hover:text-[#006b2c]">Confidentialité</Link>
-          <Link href={`/${locale}/terms`} className="hover:text-[#006b2c]">Conditions</Link>
+        <div className="mt-auto pt-12 flex flex-wrap gap-x-6 gap-y-2 opacity-50 text-[10px] uppercase tracking-widest text-[#3e4a3d]">
+          <span>© 2026 Akiba</span>
+          <Link href={`/${locale}/legal/privacy`} className="hover:text-[#006b2c] transition-colors">Confidentialité</Link>
+          <Link href={`/${locale}/legal/terms`} className="hover:text-[#006b2c] transition-colors">Conditions</Link>
+          <Link href={`/${locale}/help`} className="hover:text-[#006b2c] transition-colors">Support</Link>
         </div>
       </section>
     </main>

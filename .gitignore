@@ -45,3 +45,7 @@ supabase/.branches
 supabase/.temp
 
 .vercel
+
+# local tooling / IDE state — never commit (contains secrets, personal config)
+.claude/
+scripts/

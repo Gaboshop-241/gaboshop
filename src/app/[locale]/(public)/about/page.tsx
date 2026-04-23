@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { getLocale } from 'next-intl/server'
 
 export const metadata = {
-  title: 'À propos — GaboShop',
-  description: 'Découvrez GaboShop, la plateforme de référence pour vos abonnements digitaux au Gabon.',
+  title: 'À propos — Akiba',
+  description: 'Découvrez Akiba, la plateforme de référence pour vos abonnements digitaux au Gabon.',
 }
 
 export default async function AboutPage() {
@@ -19,7 +19,7 @@ export default async function AboutPage() {
             Le digital, <br className="hidden md:block" />au service du Gabon.
           </h1>
           <p className="text-lg md:text-xl text-[#d7fde1] max-w-2xl mx-auto leading-relaxed">
-            Fondé en 2025, GaboShop est la première plateforme gabonaise 100% dédiée à la distribution d'abonnements digitaux premium à prix local.
+            Fondé en 2025, Akiba est la première plateforme gabonaise 100% dédiée à la distribution d'abonnements digitaux premium à prix local.
           </p>
         </div>
       </section>

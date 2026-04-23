@@ -1,12 +1,12 @@
 import LegalPage from '@/components/layout/LegalPage'
 
-export const metadata = { title: 'Politique cookies — GaboShop' }
+export const metadata = { title: 'Politique cookies — Akiba' }
 
 export default function CookiesPage() {
   return (
     <LegalPage
       title="Politique de cookies"
-      subtitle="Les cookies utilisés sur GaboShop et comment les gérer."
+      subtitle="Les cookies utilisés sur Akiba et comment les gérer."
       updated="18 avril 2026"
       sections={[
         { title: '1. Qu\'est-ce qu\'un cookie ?', body: "Un cookie est un petit fichier texte déposé sur votre appareil lors de votre visite sur un site. Il permet au site de mémoriser des informations (préférences, panier, session) pour améliorer votre expérience." },

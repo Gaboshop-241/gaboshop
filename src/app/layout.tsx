@@ -6,8 +6,8 @@ const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', displa
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'GaboShop — La marketplace du Gabon',
-  description: 'Abonnements, services digitaux et revendeurs locaux réunis sur une seule plateforme sécurisée.',
+  title: 'Akiba — La marketplace du Gabon',
+  description: 'Abonnements, services digitaux et revendeurs locaux réunis sur une seule plateforme sécurisée. Payez en FCFA avec Airtel Money, Moov Money ou carte bancaire.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -273,7 +273,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex-grow flex flex-col md:flex-row min-h-screen">
+    <main className="min-h-screen flex flex-col md:flex-row bg-[#faf8ff]">
 
       {/* ── Left panel ── */}
       <section className="hidden md:flex md:w-1/2 relative overflow-hidden bg-[#006b2c] items-center justify-center">
@@ -284,10 +284,12 @@ export default function RegisterPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-[#006b2c] via-transparent to-[#00873a] opacity-40" />
         <div className="relative z-10 p-12 lg:p-20 text-white max-w-xl">
-          <div className="mb-8 flex items-center gap-2">
-            <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
-            <span className="font-extrabold text-3xl tracking-tight" style={{ fontFamily: 'var(--font-manrope)' }}>GaboShop</span>
-          </div>
+          <Link href={`/${locale}`} className="mb-8 inline-flex items-center gap-2.5 group">
+            <span className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-lg ring-1 ring-white/30 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '22px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
+            </span>
+            <span className="font-extrabold text-3xl tracking-tight text-white" style={{ fontFamily: 'var(--font-manrope)' }}>Akiba</span>
+          </Link>
           <h2 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ fontFamily: 'var(--font-manrope)' }}>
             Rejoignez la communauté
           </h2>
@@ -311,20 +313,24 @@ export default function RegisterPage() {
       </section>
 
       {/* ── Right panel ── */}
-      <section className="flex-grow md:w-1/2 bg-[#faf8ff] flex flex-col items-center justify-center p-6 sm:p-12 lg:p-16 relative">
+      <section className="flex-1 md:w-1/2 bg-[#faf8ff] flex flex-col items-center justify-center p-6 sm:p-12 lg:p-16 relative">
         {/* Mobile logo */}
-        <div className="md:hidden self-start mb-10 flex items-center">
-          <span className="font-bold text-2xl tracking-tight" style={{ fontFamily: 'var(--font-manrope)' }}>
-            <span className="text-[#006b2c]">Gabo</span><span className="text-[#131b2e]">Shop</span>
+        <Link href={`/${locale}`} className="md:hidden self-start mb-10 inline-flex items-center gap-2">
+          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-md">
+            <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '18px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
           </span>
-        </div>
+          <span className="font-bold text-2xl tracking-tight text-[#131b2e]" style={{ fontFamily: 'var(--font-manrope)' }}>Akiba</span>
+        </Link>
 
         <div className="w-full max-w-md">
           {/* Desktop logo */}
           <div className="hidden md:flex mb-10 items-center justify-between">
-            <span className="font-bold text-3xl tracking-tight" style={{ fontFamily: 'var(--font-manrope)' }}>
-              <span className="text-[#006b2c]">Gabo</span><span className="text-[#131b2e]">Shop</span>
-            </span>
+            <Link href={`/${locale}`} className="inline-flex items-center gap-2">
+              <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-md">
+                <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
+              </span>
+              <span className="font-bold text-3xl tracking-tight text-[#131b2e]" style={{ fontFamily: 'var(--font-manrope)' }}>Akiba</span>
+            </Link>
             {isVendorFlow && (
               <span className="text-xs font-semibold text-[#006b2c] bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
                 Compte Revendeur
@@ -465,9 +471,9 @@ export default function RegisterPage() {
             {/* Terms */}
             <p className="text-[0.7rem] leading-relaxed text-[#3e4a3d]/70">
               En vous inscrivant, vous acceptez nos{' '}
-              <Link href={`/${locale}/terms`} className="text-[#006b2c] font-semibold hover:underline">Conditions Générales</Link>{' '}
+              <Link href={`/${locale}/legal/terms`} className="text-[#006b2c] font-semibold hover:underline">Conditions Générales</Link>{' '}
               et notre{' '}
-              <Link href={`/${locale}/privacy`} className="text-[#006b2c] font-semibold hover:underline">Politique de Confidentialité</Link>.
+              <Link href={`/${locale}/legal/privacy`} className="text-[#006b2c] font-semibold hover:underline">Politique de Confidentialité</Link>.
             </p>
 
             {/* Submit */}
@@ -500,24 +506,18 @@ export default function RegisterPage() {
         </div>
 
         {/* Help button */}
-        <button className="absolute top-6 right-6 text-[#3e4a3d]/40 hover:text-[#006b2c] transition-colors">
+        <Link href={`/${locale}/help`} className="absolute top-6 right-6 text-[#3e4a3d]/40 hover:text-[#006b2c] transition-colors" aria-label="Aide">
           <span className="material-symbols-outlined text-2xl">help_outline</span>
-        </button>
-      </section>
+        </Link>
 
-      {/* Footer */}
-      <footer className="bg-[#283044] w-full py-5 col-span-full">
-        <div className="flex flex-col md:flex-row items-center justify-between px-8 max-w-7xl mx-auto gap-3">
-          <p className="text-xs text-slate-400">© 2025 GaboShop. Built for the Digital Equatorial Forest.</p>
-          <div className="flex gap-6">
-            {['Privacy', 'Terms', 'Support'].map((label) => (
-              <Link key={label} href={`/${locale}/${label.toLowerCase()}`} className="text-xs text-slate-400 hover:text-[#7ffc97] transition-colors">
-                {label}
-              </Link>
-            ))}
-          </div>
+        {/* Inline legal footer */}
+        <div className="w-full max-w-md mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] uppercase tracking-widest text-[#3e4a3d]/50">
+          <span>© 2026 Akiba</span>
+          <Link href={`/${locale}/legal/privacy`} className="hover:text-[#006b2c] transition-colors">Confidentialité</Link>
+          <Link href={`/${locale}/legal/terms`} className="hover:text-[#006b2c] transition-colors">Conditions</Link>
+          <Link href={`/${locale}/help`} className="hover:text-[#006b2c] transition-colors">Support</Link>
         </div>
-      </footer>
+      </section>
     </main>
   )
 }

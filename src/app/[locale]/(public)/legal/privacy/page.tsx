@@ -1,6 +1,6 @@
 import LegalPage from '@/components/layout/LegalPage'
 
-export const metadata = { title: 'Politique de confidentialité — GaboShop' }
+export const metadata = { title: 'Politique de confidentialité — Akiba' }
 
 export default function PrivacyPage() {
   return (
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           "Droit à l'effacement : demander la suppression de votre compte.",
           "Droit d'opposition : refuser le traitement marketing.",
         ]},
-        { title: '6. Contact', body: "Pour exercer vos droits ou toute question : privacy@gaboshop.ga" },
+        { title: '6. Contact', body: "Pour exercer vos droits ou toute question : privacy@akiba.ga" },
       ]}
     />
   )

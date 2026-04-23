@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         amount: totalAmount,
         currency: items[0].currency,
         orderId: order.id,
-        description: `Commande GaboShop #${order.id.slice(0, 8)}`,
+        description: `Commande Akiba #${order.id.slice(0, 8)}`,
         returnUrl: `${appUrl}/fr/checkout/success?orderId=${order.id}`,
         webhookUrl: `${webhookBase}/api/webhooks/chariow`,
         customerEmail: user.email,
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         amount: totalAmount,
         currency: items[0].currency,
         orderId: order.id,
-        description: `Commande GaboShop #${order.id.slice(0, 8)}`,
+        description: `Commande Akiba #${order.id.slice(0, 8)}`,
         returnUrl: `${appUrl}/fr/checkout/success?orderId=${order.id}`,
         webhookUrl: `${webhookBase}/api/webhooks/singpay`,
       })

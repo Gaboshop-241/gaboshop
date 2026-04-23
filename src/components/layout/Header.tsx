@@ -39,8 +39,9 @@ export default function Header() {
   }
 
   const navLinks = [
-    { href: `/${locale}/shop`,        label: locale === 'fr' ? 'Boutique'    : 'Shop'        },
-    { href: `/${locale}/marketplace`, label: locale === 'fr' ? 'Marketplace' : 'Marketplace' },
+    { href: `/${locale}/shop`,           label: 'Akiba Store'  },
+    { href: `/${locale}/marketplace`,    label: 'Akiba Market' },
+    { href: `/${locale}/become-vendor`,  label: locale === 'fr' ? 'Devenir revendeur' : 'Become a seller' },
   ]
 
   return (
@@ -57,12 +58,10 @@ export default function Header() {
         {/* ── Logo + nav ── */}
         <div className="flex items-center gap-10">
           <Link href={`/${locale}`} className="flex items-center gap-2 group">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#006b2c] to-[#00873a] flex items-center justify-center shadow-md shadow-[#006b2c]/20 group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-white" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>bolt</span>
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7ffc97] via-[#fff170] to-[#3b82f6] flex items-center justify-center shadow-md ring-1 ring-[#131b2e]/5 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-[#131b2e]" style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
             </span>
-            <span className="text-xl font-extrabold tracking-tight">
-              <span className="text-[#006b2c]">Gabo</span><span className="text-[#131b2e]">Shop</span>
-            </span>
+            <span className="text-xl font-extrabold tracking-tight text-[#131b2e]">Akiba</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
