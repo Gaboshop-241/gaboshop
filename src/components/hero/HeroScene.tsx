@@ -1,29 +1,35 @@
 'use client'
 
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 
-// Real 3D scene (Three.js / React Three Fiber) loaded client-side only.
-// The ~300KB bundle is isolated to its own chunk — server render returns the
-// lightweight fallback below, and the WebGL canvas streams in on the client.
+// If a static composite exists at /public/hero/scene.webp, use it (best LCP,
+// pixel-perfect match for the mock). If the file is missing in production
+// we fall back to the R3F WebGL scene so the slot never looks broken.
 const Scene3D = dynamic(() => import('./HeroScene3D'), {
   ssr: false,
-  loading: () => <SceneFallback />,
+  loading: () => <div className="absolute inset-0" />,
 })
 
 export function HeroScene() {
-  return (
-    <div className="relative w-full h-[420px] md:h-[460px] lg:h-[500px]">
-      <Scene3D />
-    </div>
-  )
-}
+  const [imgError, setImgError] = useState(false)
 
-// Minimal fallback: green ambient glow so the slot never looks broken while
-// the 3D chunk is loading.
-function SceneFallback() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <div className="w-[360px] h-[360px] rounded-full bg-[#22C55E]/35 blur-[100px]" />
+    <div className="relative w-full h-[420px] md:h-[460px] lg:h-[520px]">
+      {!imgError ? (
+        <Image
+          src="/hero/scene.webp"
+          alt="AKIBASTORE — téléphone avec icônes d'abonnements et sac shopping"
+          fill
+          priority
+          sizes="(min-width: 1024px) 640px, 100vw"
+          className="object-contain object-right"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <Scene3D />
+      )}
     </div>
   )
 }

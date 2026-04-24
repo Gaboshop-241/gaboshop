@@ -29,10 +29,10 @@ export default function Footer() {
   ]
 
   const SOCIALS = [
-    { icon: 'public',          label: 'Facebook', href: '#' },
-    { icon: 'photo_camera',    label: 'Instagram', href: '#' },
-    { icon: 'forum',           label: 'WhatsApp', href: '#' },
-    { icon: 'send',            label: 'Telegram', href: '#' },
+    { icon: 'public',       label: 'Facebook',  href: '#' },
+    { icon: 'photo_camera', label: 'Instagram', href: '#' },
+    { icon: 'forum',        label: 'WhatsApp',  href: '#' },
+    { icon: 'send',         label: 'Telegram',  href: '#' },
   ]
 
   return (
@@ -100,7 +100,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 5: Contact */}
+          {/* Col 5: Contact + Gabon map */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <div className="flex items-start justify-between gap-6">
               <div className="flex-1">
